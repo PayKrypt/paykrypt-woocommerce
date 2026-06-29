@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+  bootstrap="tests/bootstrap.php"
+  colors="true"
+  verbose="true"
+  failOnRisky="true"
+  failOnWarning="true"
+>
+  <testsuites>
+    <testsuite name="PayKrypt WooCommerce">
+      <directory suffix="Test.php">tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+
