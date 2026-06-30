@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Thin REST client that uses WordPress HTTP APIs.
  */
-class WC_PayKrypt_Client {
+class PAYKFOWO_Client {
 	/**
 	 * API base URL.
 	 *
@@ -70,7 +70,7 @@ class WC_PayKrypt_Client {
 	 * @param array<string,mixed> $payload Request body.
 	 * @param string              $idempotency_key Idempotency key.
 	 * @return array<string,mixed>
-	 * @throws WC_PayKrypt_API_Exception When the API fails.
+	 * @throws PAYKFOWO_API_Exception When the API fails.
 	 */
 	public function create_payment_intent( array $payload, $idempotency_key ) {
 		return $this->request( 'POST', '/v1/payment-intents', $payload, (string) $idempotency_key );
@@ -81,7 +81,7 @@ class WC_PayKrypt_Client {
 	 *
 	 * @param string $payment_intent_id Payment intent ID.
 	 * @return array<string,mixed>
-	 * @throws WC_PayKrypt_API_Exception When the API fails.
+	 * @throws PAYKFOWO_API_Exception When the API fails.
 	 */
 	public function retrieve_payment_intent( $payment_intent_id ) {
 		$payment_intent_id = rawurlencode( (string) $payment_intent_id );
@@ -96,15 +96,15 @@ class WC_PayKrypt_Client {
 	 * @param array<string,mixed>|null $payload JSON payload.
 	 * @param string                   $idempotency_key Optional idempotency key.
 	 * @return array<string,mixed>
-	 * @throws WC_PayKrypt_API_Exception When the API fails.
+	 * @throws PAYKFOWO_API_Exception When the API fails.
 	 */
 	private function request( $method, $path, $payload = null, $idempotency_key = '' ) {
 		if ( '' === $this->api_base_url ) {
-			throw new WC_PayKrypt_API_Exception( esc_html__( 'PayKrypt API base URL is not configured.', 'paykrypt-for-woocommerce' ) );
+			throw new PAYKFOWO_API_Exception( esc_html__( 'PayKrypt API base URL is not configured.', 'paykrypt-for-woocommerce' ) );
 		}
 
 		if ( '' === $this->api_key ) {
-			throw new WC_PayKrypt_API_Exception( esc_html__( 'PayKrypt API key is not configured.', 'paykrypt-for-woocommerce' ) );
+			throw new PAYKFOWO_API_Exception( esc_html__( 'PayKrypt API key is not configured.', 'paykrypt-for-woocommerce' ) );
 		}
 
 		$url     = $this->api_base_url . $path;
@@ -135,7 +135,7 @@ class WC_PayKrypt_Client {
 		if ( is_wp_error( $response ) ) {
 			$error_message = sanitize_text_field( $response->get_error_message() );
 			$this->log( 'Request failed: ' . $error_message );
-			throw new WC_PayKrypt_API_Exception( $error_message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Sanitized above; exception messages are not direct output.
+			throw new PAYKFOWO_API_Exception( $error_message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Sanitized above; exception messages are not direct output.
 		}
 
 		$status_code = wp_remote_retrieve_response_code( $response );
@@ -165,7 +165,7 @@ class WC_PayKrypt_Client {
 
 			$error_message = sanitize_text_field( (string) $error_message );
 			$error_code    = sanitize_key( (string) $error_code );
-			throw new WC_PayKrypt_API_Exception( $error_message, $status_code, $error_code, $body ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Values are sanitized or retained as non-output diagnostic data.
+			throw new PAYKFOWO_API_Exception( $error_message, $status_code, $error_code, $body ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Values are sanitized or retained as non-output diagnostic data.
 		}
 
 		if ( '' === $body ) {
@@ -173,7 +173,7 @@ class WC_PayKrypt_Client {
 		}
 
 		if ( ! is_array( $decoded ) ) {
-			throw new WC_PayKrypt_API_Exception( esc_html__( 'PayKrypt returned an invalid JSON response.', 'paykrypt-for-woocommerce' ), $status_code, '', $body ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Raw body is retained as non-output diagnostic data.
+			throw new PAYKFOWO_API_Exception( esc_html__( 'PayKrypt returned an invalid JSON response.', 'paykrypt-for-woocommerce' ), $status_code, '', $body ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Raw body is retained as non-output diagnostic data.
 		}
 
 		$this->log( 'Request succeeded', array( 'status' => $status_code ) );

@@ -20,9 +20,8 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="paykrypt_wc"/>
-				<element value="WC_PayKrypt"/>
-				<element value="PayKrypt"/>
+				<element value="paykfowo"/>
+				<element value="PAYKFOWO"/>
 			</property>
 		</properties>
 	</rule>

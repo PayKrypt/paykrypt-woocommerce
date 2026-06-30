@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Adds admin order actions for PayKrypt.
  */
-class WC_PayKrypt_Admin {
+class PAYKFOWO_Admin {
 	/**
 	 * Registers hooks.
 	 */
@@ -42,13 +42,13 @@ class WC_PayKrypt_Admin {
 			return;
 		}
 
-		if ( ! $order->get_meta( PayKrypt_WC_Gateway::META_INTENT_ID ) ) {
+		if ( ! $order->get_meta( PAYKFOWO_Gateway::META_INTENT_ID ) ) {
 			$order->add_order_note( __( 'Manual PayKrypt sync skipped: this order has no PayKrypt payment intent.', 'paykrypt-for-woocommerce' ) );
 			return;
 		}
 
 		try {
-			$status = WC_PayKrypt_Order_Sync::sync_order( $order, true );
+			$status = PAYKFOWO_Order_Sync::sync_order( $order, true );
 			$order->add_order_note(
 				sprintf(
 					/* translators: 1: PayKrypt payment status. */
@@ -57,8 +57,8 @@ class WC_PayKrypt_Admin {
 				)
 			);
 			$order->save();
-		} catch ( WC_PayKrypt_API_Exception $exception ) {
-			$order->update_meta_data( PayKrypt_WC_Gateway::META_LAST_ERROR, $exception->getMessage() );
+		} catch ( PAYKFOWO_API_Exception $exception ) {
+			$order->update_meta_data( PAYKFOWO_Gateway::META_LAST_ERROR, $exception->getMessage() );
 			$order->add_order_note(
 				sprintf(
 					/* translators: 1: API error message. */

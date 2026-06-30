@@ -3,8 +3,8 @@
 namespace PayKryptWooCommerce\Tests;
 
 use Brain\Monkey\Functions;
-use WC_PayKrypt_API_Exception;
-use WC_PayKrypt_Client;
+use PAYKFOWO_API_Exception;
+use PAYKFOWO_Client;
 
 class PayKryptClientTest extends TestCase {
 	public function test_create_payment_intent_sends_authorization_json_and_idempotency_headers(): void {
@@ -36,7 +36,7 @@ class PayKryptClientTest extends TestCase {
 		Functions\expect( 'wp_remote_retrieve_response_code' )->once()->andReturn( 201 );
 		Functions\expect( 'wp_remote_retrieve_body' )->once()->andReturn( '{"id":"pi_123","status":"awaiting_payment"}' );
 
-		$client = new WC_PayKrypt_Client( 'https://api.paykrypt.io/', 'pk_test_123' );
+		$client = new PAYKFOWO_Client( 'https://api.paykrypt.io/', 'pk_test_123' );
 		$intent = $client->create_payment_intent(
 			array(
 				'amount'   => '100.00',
@@ -73,7 +73,7 @@ class PayKryptClientTest extends TestCase {
 		Functions\expect( 'wp_remote_retrieve_response_code' )->once()->andReturn( 200 );
 		Functions\expect( 'wp_remote_retrieve_body' )->once()->andReturn( '{"id":"pi_123","status":"confirmed","transactionsSummary":{"isFullyPaid":true}}' );
 
-		$client = new WC_PayKrypt_Client( 'https://api.paykrypt.io', 'pk_live_123' );
+		$client = new PAYKFOWO_Client( 'https://api.paykrypt.io', 'pk_live_123' );
 		$intent = $client->retrieve_payment_intent( 'pi_123' );
 
 		$this->assertSame( 'confirmed', $intent['status'] );
@@ -95,14 +95,14 @@ class PayKryptClientTest extends TestCase {
 		Functions\expect( 'wp_remote_retrieve_response_message' )->once()->andReturn( 'Forbidden' );
 		Functions\expect( 'wp_remote_retrieve_body' )->once()->andReturn( '{"error":{"message":"API key missing payment_intents permission","code":"missing_permission"}}' );
 
-		$client = new WC_PayKrypt_Client( 'https://api.paykrypt.io', 'pk_live_123' );
+		$client = new PAYKFOWO_Client( 'https://api.paykrypt.io', 'pk_live_123' );
 
-		$this->expectException( WC_PayKrypt_API_Exception::class );
+		$this->expectException( PAYKFOWO_API_Exception::class );
 		$this->expectExceptionMessage( 'API key missing payment_intents permission' );
 
 		try {
 			$client->create_payment_intent( array( 'amount' => '100.00', 'currency' => 'USD' ), 'idem-123' );
-		} catch ( WC_PayKrypt_API_Exception $exception ) {
+		} catch ( PAYKFOWO_API_Exception $exception ) {
 			$this->assertSame( 403, $exception->get_status_code() );
 			$this->assertSame( 'missing_permission', $exception->get_paykrypt_code() );
 			throw $exception;

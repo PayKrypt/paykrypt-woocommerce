@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Exception thrown for PayKrypt API failures.
  */
-class WC_PayKrypt_API_Exception extends Exception {
+class PAYKFOWO_API_Exception extends Exception {
 	/**
 	 * HTTP status code.
 	 *

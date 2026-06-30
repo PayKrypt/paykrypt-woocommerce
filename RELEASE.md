@@ -4,7 +4,7 @@ The intended WordPress.org slug and text domain are `paykrypt-for-woocommerce`.
 
 ## Before submission
 
-1. Create a WordPress.org account. If its username is not `paykrypt`, replace the `Contributors` value in `readme.txt` with the actual username.
+1. Use the WordPress.org account `paykryptio`, which is listed in the `Contributors` value in `readme.txt`.
 2. Confirm the PayKrypt Terms of Use and Privacy Policy URLs in `readme.txt` remain current.
 3. Run `composer install`, `composer test`, `composer phpcs`, and `composer audit --locked`.
 4. Test activation on WordPress 7.0 with WooCommerce 10.9.

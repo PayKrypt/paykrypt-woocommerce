@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Registers PayKrypt with WooCommerce Checkout Blocks.
  */
-final class WC_PayKrypt_Blocks extends \Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType {
+final class PAYKFOWO_Blocks extends \Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType {
 	/**
 	 * Payment method name.
 	 *
@@ -51,9 +51,9 @@ final class WC_PayKrypt_Blocks extends \Automattic\WooCommerce\Blocks\Payments\I
 	public function get_payment_method_script_handles() {
 		wp_register_script(
 			'paykrypt-for-woocommerce-blocks',
-			plugins_url( 'assets/js/paykrypt-blocks.js', PAYKRYPT_WC_FILE ),
+			plugins_url( 'assets/js/paykrypt-blocks.js', PAYKFOWO_FILE ),
 			array( 'wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities' ),
-			PAYKRYPT_WC_VERSION,
+			PAYKFOWO_VERSION,
 			true
 		);
 

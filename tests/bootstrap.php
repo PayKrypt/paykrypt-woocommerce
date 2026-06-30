@@ -91,7 +91,7 @@ if ( ! function_exists( 'wc_get_logger' ) ) {
 	}
 }
 
-require_once dirname( __DIR__ ) . '/includes/class-wc-paykrypt-api-exception.php';
-require_once dirname( __DIR__ ) . '/includes/class-wc-paykrypt-client.php';
-require_once dirname( __DIR__ ) . '/includes/class-paykrypt-wc-gateway.php';
-require_once dirname( __DIR__ ) . '/includes/class-wc-paykrypt-order-sync.php';
+require_once dirname( __DIR__ ) . '/includes/class-paykfowo-api-exception.php';
+require_once dirname( __DIR__ ) . '/includes/class-paykfowo-client.php';
+require_once dirname( __DIR__ ) . '/includes/class-paykfowo-gateway.php';
+require_once dirname( __DIR__ ) . '/includes/class-paykfowo-order-sync.php';

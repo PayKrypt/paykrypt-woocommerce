@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * PayKrypt WooCommerce payment gateway.
  */
-class PayKrypt_WC_Gateway extends WC_Payment_Gateway {
+class PAYKFOWO_Gateway extends WC_Payment_Gateway {
 	const META_INTENT_ID       = '_paykrypt_payment_intent_id';
 	const META_IDEMPOTENCY_KEY = '_paykrypt_idempotency_key';
 	const META_CHECKOUT_URL    = '_paykrypt_checkout_url';
@@ -132,7 +132,7 @@ class PayKrypt_WC_Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param int $order_id WooCommerce order ID.
 	 * @return array<string,string>
-	 * @throws WC_PayKrypt_API_Exception When PayKrypt cannot create a payment intent.
+	 * @throws PAYKFOWO_API_Exception When PayKrypt cannot create a payment intent.
 	 */
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
@@ -152,7 +152,7 @@ class PayKrypt_WC_Gateway extends WC_Payment_Gateway {
 
 		try {
 			if ( '' === $this->get_gateway_base_url() ) {
-				throw new WC_PayKrypt_API_Exception( __( 'PayKrypt checkout base URL is not configured.', 'paykrypt-for-woocommerce' ) );
+				throw new PAYKFOWO_API_Exception( __( 'PayKrypt checkout base URL is not configured.', 'paykrypt-for-woocommerce' ) );
 			}
 
 			$client          = $this->get_client();
@@ -162,7 +162,7 @@ class PayKrypt_WC_Gateway extends WC_Payment_Gateway {
 			$intent_id       = isset( $intent['id'] ) ? (string) $intent['id'] : '';
 
 			if ( '' === $intent_id ) {
-				throw new WC_PayKrypt_API_Exception( __( 'PayKrypt did not return a payment intent ID.', 'paykrypt-for-woocommerce' ) );
+				throw new PAYKFOWO_API_Exception( __( 'PayKrypt did not return a payment intent ID.', 'paykrypt-for-woocommerce' ) );
 			}
 
 			$checkout_url = $this->build_checkout_url( $intent_id );
@@ -190,7 +190,7 @@ class PayKrypt_WC_Gateway extends WC_Payment_Gateway {
 				'result'   => 'success',
 				'redirect' => esc_url_raw( $checkout_url ),
 			);
-		} catch ( WC_PayKrypt_API_Exception $exception ) {
+		} catch ( PAYKFOWO_API_Exception $exception ) {
 			$message = sprintf(
 				/* translators: 1: API error message. */
 				__( 'PayKrypt payment could not be started: %s', 'paykrypt-for-woocommerce' ),
@@ -208,10 +208,10 @@ class PayKrypt_WC_Gateway extends WC_Payment_Gateway {
 	/**
 	 * Returns the client for current settings.
 	 *
-	 * @return WC_PayKrypt_Client
+	 * @return PAYKFOWO_Client
 	 */
 	public function get_client() {
-		return new WC_PayKrypt_Client(
+		return new PAYKFOWO_Client(
 			$this->get_api_base_url(),
 			$this->get_option( 'api_key', '' ),
 			30,

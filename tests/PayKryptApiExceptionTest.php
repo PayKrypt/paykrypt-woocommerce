@@ -2,11 +2,11 @@
 
 namespace PayKryptWooCommerce\Tests;
 
-use WC_PayKrypt_API_Exception;
+use PAYKFOWO_API_Exception;
 
 class PayKryptApiExceptionTest extends TestCase {
 	public function test_it_exposes_api_error_details(): void {
-		$exception = new WC_PayKrypt_API_Exception(
+		$exception = new PAYKFOWO_API_Exception(
 			'Invalid API key',
 			401,
 			'authentication_error',

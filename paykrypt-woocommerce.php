@@ -24,13 +24,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PAYKRYPT_WC_VERSION', '0.1.0' );
-define( 'PAYKRYPT_WC_FILE', __FILE__ );
-define( 'PAYKRYPT_WC_PATH', plugin_dir_path( __FILE__ ) );
+define( 'PAYKFOWO_VERSION', '0.1.0' );
+define( 'PAYKFOWO_FILE', __FILE__ );
+define( 'PAYKFOWO_PATH', plugin_dir_path( __FILE__ ) );
 
-require_once PAYKRYPT_WC_PATH . 'includes/class-wc-paykrypt-api-exception.php';
-require_once PAYKRYPT_WC_PATH . 'includes/class-wc-paykrypt-client.php';
-require_once PAYKRYPT_WC_PATH . 'includes/class-wc-paykrypt-order-sync.php';
+require_once PAYKFOWO_PATH . 'includes/class-paykfowo-api-exception.php';
+require_once PAYKFOWO_PATH . 'includes/class-paykfowo-client.php';
+require_once PAYKFOWO_PATH . 'includes/class-paykfowo-order-sync.php';
 
 /**
  * Adds the custom cron interval used for payment polling.
@@ -38,9 +38,9 @@ require_once PAYKRYPT_WC_PATH . 'includes/class-wc-paykrypt-order-sync.php';
  * @param array<string,array<string,int|string>> $schedules Registered schedules.
  * @return array<string,array<string,int|string>>
  */
-function paykrypt_wc_cron_schedules( $schedules ) {
-	if ( ! isset( $schedules['paykrypt_five_minutes'] ) ) {
-		$schedules['paykrypt_five_minutes'] = array(
+function paykfowo_cron_schedules( $schedules ) {
+	if ( ! isset( $schedules['paykfowo_five_minutes'] ) ) {
+		$schedules['paykfowo_five_minutes'] = array(
 			'interval' => 5 * MINUTE_IN_SECONDS, // phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval -- Payment statuses need timely reconciliation.
 			'display'  => __( 'Every five minutes', 'paykrypt-for-woocommerce' ),
 		);
@@ -48,12 +48,12 @@ function paykrypt_wc_cron_schedules( $schedules ) {
 
 	return $schedules;
 }
-add_filter( 'cron_schedules', 'paykrypt_wc_cron_schedules' ); // phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval -- Payment statuses need timely reconciliation.
+add_filter( 'cron_schedules', 'paykfowo_cron_schedules' ); // phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval -- Payment statuses need timely reconciliation.
 
 /**
  * Adds suggested PayKrypt disclosure text to the privacy policy guide.
  */
-function paykrypt_wc_add_privacy_policy_content() {
+function paykfowo_add_privacy_policy_content() {
 	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 		return;
 	}
@@ -68,40 +68,40 @@ function paykrypt_wc_add_privacy_policy_content() {
 
 	wp_add_privacy_policy_content( __( 'PayKrypt for WooCommerce', 'paykrypt-for-woocommerce' ), wp_kses_post( $content ) );
 }
-add_action( 'admin_init', 'paykrypt_wc_add_privacy_policy_content' );
+add_action( 'admin_init', 'paykfowo_add_privacy_policy_content' );
 
 /**
  * Declares WooCommerce feature compatibility.
  */
-function paykrypt_wc_declare_compatibility() {
+function paykfowo_declare_compatibility() {
 	if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 	}
 }
-add_action( 'before_woocommerce_init', 'paykrypt_wc_declare_compatibility' );
+add_action( 'before_woocommerce_init', 'paykfowo_declare_compatibility' );
 
 /**
  * Schedules polling on plugin activation.
  */
-function paykrypt_wc_activate() {
-	if ( ! wp_next_scheduled( 'paykrypt_wc_poll_orders' ) ) {
-		wp_schedule_event( time() + MINUTE_IN_SECONDS, 'paykrypt_five_minutes', 'paykrypt_wc_poll_orders' );
+function paykfowo_activate() {
+	if ( ! wp_next_scheduled( 'paykfowo_poll_orders' ) ) {
+		wp_schedule_event( time() + MINUTE_IN_SECONDS, 'paykfowo_five_minutes', 'paykfowo_poll_orders' );
 	}
 }
-register_activation_hook( __FILE__, 'paykrypt_wc_activate' );
+register_activation_hook( __FILE__, 'paykfowo_activate' );
 
 /**
  * Clears polling on plugin deactivation.
  */
-function paykrypt_wc_deactivate() {
-	wp_clear_scheduled_hook( 'paykrypt_wc_poll_orders' );
+function paykfowo_deactivate() {
+	wp_clear_scheduled_hook( 'paykfowo_poll_orders' );
 }
-register_deactivation_hook( __FILE__, 'paykrypt_wc_deactivate' );
+register_deactivation_hook( __FILE__, 'paykfowo_deactivate' );
 
 /**
  * Shows a dependency notice when WooCommerce is unavailable.
  */
-function paykrypt_wc_missing_woocommerce_notice() {
+function paykfowo_missing_woocommerce_notice() {
 	if ( current_user_can( 'activate_plugins' ) ) {
 		echo '<div class="notice notice-error"><p>';
 		echo esc_html__( 'PayKrypt for WooCommerce requires WooCommerce to be installed and active.', 'paykrypt-for-woocommerce' );
@@ -112,34 +112,34 @@ function paykrypt_wc_missing_woocommerce_notice() {
 /**
  * Initializes the payment gateway once WooCommerce is loaded.
  */
-function paykrypt_wc_init() {
+function paykfowo_init() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
-		add_action( 'admin_notices', 'paykrypt_wc_missing_woocommerce_notice' );
+		add_action( 'admin_notices', 'paykfowo_missing_woocommerce_notice' );
 		return;
 	}
 
-	require_once PAYKRYPT_WC_PATH . 'includes/class-paykrypt-wc-gateway.php';
-	require_once PAYKRYPT_WC_PATH . 'includes/class-wc-paykrypt-admin.php';
+	require_once PAYKFOWO_PATH . 'includes/class-paykfowo-gateway.php';
+	require_once PAYKFOWO_PATH . 'includes/class-paykfowo-admin.php';
 
-	WC_PayKrypt_Order_Sync::init();
-	WC_PayKrypt_Admin::init();
+	PAYKFOWO_Order_Sync::init();
+	PAYKFOWO_Admin::init();
 }
-add_action( 'plugins_loaded', 'paykrypt_wc_init', 20 );
+add_action( 'plugins_loaded', 'paykfowo_init', 20 );
 
 /**
  * Registers PayKrypt with WooCommerce Checkout Blocks.
  *
  * @param Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry Registry instance.
  */
-function paykrypt_wc_register_blocks_payment_method( $payment_method_registry ) {
+function paykfowo_register_blocks_payment_method( $payment_method_registry ) {
 	if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
 		return;
 	}
 
-	require_once PAYKRYPT_WC_PATH . 'includes/class-wc-paykrypt-blocks.php';
-	$payment_method_registry->register( new WC_PayKrypt_Blocks() );
+	require_once PAYKFOWO_PATH . 'includes/class-paykfowo-blocks.php';
+	$payment_method_registry->register( new PAYKFOWO_Blocks() );
 }
-add_action( 'woocommerce_blocks_payment_method_type_registration', 'paykrypt_wc_register_blocks_payment_method' );
+add_action( 'woocommerce_blocks_payment_method_type_registration', 'paykfowo_register_blocks_payment_method' );
 
 /**
  * Registers the gateway with WooCommerce.
@@ -147,8 +147,8 @@ add_action( 'woocommerce_blocks_payment_method_type_registration', 'paykrypt_wc_
  * @param array<int,string> $gateways Gateway class names.
  * @return array<int,string>
  */
-function paykrypt_wc_add_gateway( $gateways ) {
-	$gateways[] = 'PayKrypt_WC_Gateway';
+function paykfowo_add_gateway( $gateways ) {
+	$gateways[] = 'PAYKFOWO_Gateway';
 	return $gateways;
 }
-add_filter( 'woocommerce_payment_gateways', 'paykrypt_wc_add_gateway' );
+add_filter( 'woocommerce_payment_gateways', 'paykfowo_add_gateway' );

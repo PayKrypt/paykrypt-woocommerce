@@ -12,19 +12,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Synchronizes WooCommerce orders with PayKrypt payment intents.
  */
-class WC_PayKrypt_Order_Sync {
+class PAYKFOWO_Order_Sync {
 	/**
 	 * Registers hooks.
 	 */
 	public static function init() {
-		add_action( 'paykrypt_wc_poll_orders', array( __CLASS__, 'poll_orders' ) );
+		add_action( 'paykfowo_poll_orders', array( __CLASS__, 'poll_orders' ) );
 	}
 
 	/**
 	 * Polls a batch of PayKrypt orders.
 	 */
 	public static function poll_orders() {
-		if ( ! function_exists( 'wc_get_orders' ) || ! class_exists( 'PayKrypt_WC_Gateway' ) ) {
+		if ( ! function_exists( 'wc_get_orders' ) || ! class_exists( 'PAYKFOWO_Gateway' ) ) {
 			return;
 		}
 
@@ -36,7 +36,7 @@ class WC_PayKrypt_Order_Sync {
 				'order'      => 'ASC',
 				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required to find orders with PayKrypt intents.
 					array(
-						'key'     => PayKrypt_WC_Gateway::META_INTENT_ID,
+						'key'     => PAYKFOWO_Gateway::META_INTENT_ID,
 						'compare' => 'EXISTS',
 					),
 				),
@@ -56,14 +56,14 @@ class WC_PayKrypt_Order_Sync {
 	 * @param WC_Order $order WooCommerce order.
 	 * @param bool     $manual Whether the sync was manually requested by an admin.
 	 * @return string Final observed PayKrypt status.
-	 * @throws WC_PayKrypt_API_Exception When the API fails.
+	 * @throws PAYKFOWO_API_Exception When the API fails.
 	 */
 	public static function sync_order( WC_Order $order, $manual = false ) {
-		if ( ! class_exists( 'PayKrypt_WC_Gateway' ) ) {
+		if ( ! class_exists( 'PAYKFOWO_Gateway' ) ) {
 			return '';
 		}
 
-		$intent_id = (string) $order->get_meta( PayKrypt_WC_Gateway::META_INTENT_ID );
+		$intent_id = (string) $order->get_meta( PAYKFOWO_Gateway::META_INTENT_ID );
 		if ( '' === $intent_id ) {
 			return '';
 		}
@@ -72,14 +72,14 @@ class WC_PayKrypt_Order_Sync {
 		$intent = $client->retrieve_payment_intent( $intent_id );
 		$status = isset( $intent['status'] ) ? (string) $intent['status'] : '';
 
-		$previous_status = (string) $order->get_meta( PayKrypt_WC_Gateway::META_STATUS );
+		$previous_status = (string) $order->get_meta( PAYKFOWO_Gateway::META_STATUS );
 		$status_changed  = $status && $status !== $previous_status;
 
 		if ( $status ) {
-			$order->update_meta_data( PayKrypt_WC_Gateway::META_STATUS, $status );
+			$order->update_meta_data( PAYKFOWO_Gateway::META_STATUS, $status );
 		}
-		$order->update_meta_data( PayKrypt_WC_Gateway::META_LAST_SYNC_AT, gmdate( 'c' ) );
-		$order->delete_meta_data( PayKrypt_WC_Gateway::META_LAST_ERROR );
+		$order->update_meta_data( PAYKFOWO_Gateway::META_LAST_SYNC_AT, gmdate( 'c' ) );
+		$order->delete_meta_data( PAYKFOWO_Gateway::META_LAST_ERROR );
 
 		$summary       = isset( $intent['transactionsSummary'] ) && is_array( $intent['transactionsSummary'] ) ? $intent['transactionsSummary'] : array();
 		$is_fully_paid = ! empty( $summary['isFullyPaid'] );
@@ -189,7 +189,7 @@ class WC_PayKrypt_Order_Sync {
 	/**
 	 * Builds a configured PayKrypt client.
 	 *
-	 * @return WC_PayKrypt_Client
+	 * @return PAYKFOWO_Client
 	 */
 	private static function get_client_from_settings() {
 		$settings    = get_option( 'woocommerce_paykrypt_settings', array() );
@@ -201,7 +201,7 @@ class WC_PayKrypt_Order_Sync {
 			$api_base_url = 'https://api.paykrypt.io';
 		}
 
-		return new WC_PayKrypt_Client(
+		return new PAYKFOWO_Client(
 			$api_base_url,
 			isset( $settings['api_key'] ) ? $settings['api_key'] : '',
 			30,

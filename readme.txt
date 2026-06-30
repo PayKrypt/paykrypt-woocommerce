@@ -1,5 +1,5 @@
 === PayKrypt for WooCommerce ===
-Contributors: paykrypt
+Contributors: paykryptio
 Tags: woocommerce, crypto payments, bitcoin payments, payment gateway, cryptocurrency
 Requires at least: 6.0
 Requires PHP: 7.4
